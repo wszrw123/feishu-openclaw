@@ -1,0 +1,7 @@
+interface:
+  display_name: "OpenClaw Feishu Setup"
+  short_description: "为 OpenClaw 配置飞书机器人接入与排障"
+  default_prompt: "Use $feishu-openclaw to connect OpenClaw to a Feishu bot and troubleshoot missing replies."
+
+policy:
+  allow_implicit_invocation: true
