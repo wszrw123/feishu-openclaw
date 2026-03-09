@@ -1,5 +1,21 @@
 # feishu-openclaw
 
+<p align="center">
+  <img src="./assets/hero.svg" alt="feishu-openclaw hero" width="100%" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/OpenClaw-Feishu%20Bridge-2563EB?style=for-the-badge" alt="OpenClaw Feishu Bridge" />
+  <img src="https://img.shields.io/badge/Mode-Event%20%2B%20Polling-16A34A?style=for-the-badge" alt="Event and Polling" />
+  <img src="https://img.shields.io/badge/Stack-Node.js%20Scripts-111827?style=for-the-badge" alt="Node.js Scripts" />
+  <img src="https://img.shields.io/badge/Use%20Case-Feishu%20AI%20Assistant-7C3AED?style=for-the-badge" alt="Feishu AI Assistant" />
+</p>
+
+<p align="center">
+  <strong>把 OpenClaw 接进飞书群，不止能接，还能稳定跑。</strong><br/>
+  从 <code>chat_id</code> 获取、配置写入、事件排障，到轮询兜底，一套打通。
+</p>
+
 一个面向 **OpenClaw × 飞书机器人** 的可复用 Skill。  
 它解决的不是“能不能接上”，而是更现实的问题：
 
@@ -9,6 +25,13 @@
 - **事件订阅不稳定时，怎么用轮询方案兜底**
 
 如果你也在折腾 **OpenClaw 接入飞书 / Lark**，这个仓库可以直接帮你少踩很多坑。
+
+## 为什么值得关注
+
+- **上手快**：不是从零摸索，而是直接给你一套可复用脚本
+- **更真实**：覆盖“看起来配置没问题，但群里就是不回”的真实场景
+- **更稳**：原生事件模式跑不稳时，直接切轮询兜底
+- **更适合分享**：内容按开源可发布标准整理，不内置敏感信息
 
 ## 这个项目适合谁
 
@@ -70,6 +93,21 @@
 - `scripts/feishu_openclaw_relay.mjs`  
   飞书轮询桥：读取群消息，交给 OpenClaw 本地 agent 生成回复，再回发到群里
 
+## 工作流总览
+
+```mermaid
+flowchart LR
+  A[飞书群消息] --> B{使用哪条链路?}
+  B -->|事件模式| C[Feishu WebSocket / 事件订阅]
+  B -->|轮询兜底| D[读取群消息列表]
+  C --> E[OpenClaw Feishu Channel]
+  D --> F[Polling Relay]
+  E --> G[OpenClaw Agent]
+  F --> G[OpenClaw Agent]
+  G --> H[生成回复]
+  H --> I[回发到飞书群]
+```
+
 ## 快速开始
 
 ### 1）准备环境变量
@@ -107,6 +145,20 @@ Feishu main: enabled, configured, running
 ```
 
 说明基础接入已经成功。
+
+## 页面预览
+
+### 事件模式
+
+当飞书事件订阅正常工作时，链路是：飞书消息 → OpenClaw 渠道 → Agent 回复。
+
+![事件模式预览](./assets/preview-event-mode.svg)
+
+### 轮询兜底模式
+
+当事件订阅不稳定时，可以直接读取群消息列表，再把回复回发到飞书群。
+
+![轮询模式预览](./assets/preview-polling-mode.svg)
 
 ## 如果事件订阅还是不稳定
 
@@ -164,6 +216,30 @@ node scripts/feishu_openclaw_relay.mjs --chat-id oc_xxx
 - 本地 `.env`（且加入 `.gitignore`）
 - Secret Manager / 系统环境变量
 
+## FAQ
+
+### 1. 这个仓库是给谁用的？
+
+给想把 **OpenClaw 接进飞书群** 的开发者和团队用的，尤其适合正在做 AI 助手、内部机器人、群协作自动化的人。
+
+### 2. 一定要走飞书事件订阅吗？
+
+不一定。  
+如果事件模式稳定，优先用事件模式；如果已经配好了但还不稳定，直接切到轮询兜底会更省时间。
+
+### 3. 为什么飞书里“像是没回复”，但实际上已经回了？
+
+因为飞书机器人回复有时会以 `post` 富文本或“回复原消息线程”的方式出现，不一定是最显眼的普通文本气泡。
+
+### 4. 为什么这个项目不直接放真实配置？
+
+因为这是公开仓库。  
+示例必须默认不包含真实 `App Secret`、token、企业群 ID、用户 ID 或调试日志原文。
+
+### 5. 只会飞书，没接触过 OpenClaw，也能用吗？
+
+可以。这个仓库已经把“接入”“验证”“排障”“兜底”拆成脚本和步骤，按 README 跑就行。
+
 ## 为什么值得点个 Star
 
 因为这不是一份“照着点按钮”的静态教程，  
@@ -175,3 +251,9 @@ node scripts/feishu_openclaw_relay.mjs --chat-id oc_xxx
 - 有公开分享时的安全边界
 
 如果你也在做 **AI 助手接入飞书**、**飞书群机器人协作**、**OpenClaw 渠道扩展**，欢迎一起用、一起改、一起补坑。
+
+## 传播文案
+
+如果你准备把这个项目发出去，可以直接参考：
+
+- `docs/share-copy.md` —— 已整理好的朋友圈、飞书群、推特 / X、GitHub 动态文案
